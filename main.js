@@ -34,7 +34,26 @@ const doorRoughnessTexture = textureLoader.load(
   "./textures/door/roughness.jpg"
 );
 const doorNormalTexture = textureLoader.load("./textures/door/normal.jpg");
-console.log(doorColorTexture);
+const grassColorTexture = textureLoader.load("./textures/grass/color.jpg");
+const grassNormalTexture = textureLoader.load("./textures/grass/normal.jpg");
+const grassRoughnessTexture = textureLoader.load(
+  "./textures/grass/roughness.jpg"
+);
+const grassAoTexture = textureLoader.load(
+  "./textures/grass/ambientOcclusion.jpg"
+);
+grassColorTexture.repeat.set(8, 8);
+grassNormalTexture.repeat.set(8, 8);
+grassRoughnessTexture.repeat.set(8, 8);
+grassAoTexture.repeat.set(8, 8);
+grassColorTexture.wrapS = THREE.RepeatWrapping;
+grassNormalTexture.wrapS = THREE.RepeatWrapping;
+grassRoughnessTexture.wrapS = THREE.RepeatWrapping;
+grassAoTexture.wrapT = THREE.RepeatWrapping;
+grassColorTexture.wrapT = THREE.RepeatWrapping;
+grassNormalTexture.wrapT = THREE.RepeatWrapping;
+grassRoughnessTexture.wrapT = THREE.RepeatWrapping;
+grassAoTexture.wrapT = THREE.RepeatWrapping;
 
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
 scene.add(camera);
@@ -43,7 +62,18 @@ camera.position.y = 7;
 
 const grass = new THREE.Mesh(
   new THREE.PlaneGeometry(50, 50, 64, 64),
-  new THREE.MeshStandardMaterial({ color: "#0d5c1e", side: THREE.DoubleSide })
+  new THREE.MeshStandardMaterial({
+    color: "#0d5c1e",
+    side: THREE.DoubleSide,
+    map: grassColorTexture,
+    normalMap: grassNormalTexture,
+    aoMap: grassAoTexture,
+    roughnessMap: grassRoughnessTexture,
+  })
+);
+grass.geometry.setAttribute(
+  "uv2",
+  new THREE.Float32BufferAttribute(grass.geometry.attributes.uv.array, 2)
 );
 grass.receiveShadow = true;
 grass.rotation.x = -Math.PI * 0.5;
@@ -93,38 +123,80 @@ door.geometry.setAttribute(
 door.position.y = 2.5;
 door.position.z = 4.01;
 house.add(walls, roof, door);
+house.castShadow = true;
 scene.add(house);
 
 const bushes = new THREE.Group();
 const bush1 = new THREE.Mesh(
   new THREE.SphereGeometry(1),
-  new THREE.MeshStandardMaterial({ color: "#23913b" })
+  new THREE.MeshStandardMaterial({
+    color: "#23913b",
+    map: grassColorTexture,
+    normalMap: grassNormalTexture,
+    roughnessMap: grassRoughnessTexture,
+    aoMap: grassAoTexture,
+  })
+);
+bush1.geometry.setAttribute(
+  "uv2",
+  new THREE.Float32BufferAttribute(bush1.geometry.attributes.uv.array, 2)
 );
 bush1.position.x = 2;
 bush1.position.y = 0.5 + 0.01;
 bush1.position.z = 0.5 + 4 + 0.01;
 const bush2 = new THREE.Mesh(
   new THREE.SphereGeometry(0.5),
-  new THREE.MeshStandardMaterial({ color: "#23913b" })
+  new THREE.MeshStandardMaterial({
+    color: "#23913b",
+    map: grassColorTexture,
+    normalMap: grassNormalTexture,
+    roughnessMap: grassRoughnessTexture,
+    aoMap: grassAoTexture,
+  })
+);
+bush2.geometry.setAttribute(
+  "uv2",
+  new THREE.Float32BufferAttribute(bush2.geometry.attributes.uv.array, 2)
 );
 bush2.position.x = -2;
 bush2.position.y = 0.25 + 0.01;
 bush2.position.z = 0.25 + 4 + 0.01;
 const bush3 = new THREE.Mesh(
   new THREE.SphereGeometry(1.3),
-  new THREE.MeshStandardMaterial({ color: "#23913b" })
+  new THREE.MeshStandardMaterial({
+    color: "#23913b",
+    map: grassColorTexture,
+    normalMap: grassNormalTexture,
+    roughnessMap: grassRoughnessTexture,
+    aoMap: grassAoTexture,
+  })
+);
+bush3.geometry.setAttribute(
+  "uv2",
+  new THREE.Float32BufferAttribute(bush3.geometry.attributes.uv.array, 2)
 );
 bush3.position.x = 3;
 bush3.position.y = 0.65 + 0.01;
 bush3.position.z = 0.65 + 4 + 0.01;
 const bush4 = new THREE.Mesh(
   new THREE.SphereGeometry(1.2),
-  new THREE.MeshStandardMaterial({ color: "#23913b" })
+  new THREE.MeshStandardMaterial({
+    color: "#23913b",
+    map: grassColorTexture,
+    normalMap: grassNormalTexture,
+    roughnessMap: grassRoughnessTexture,
+    aoMap: grassAoTexture,
+  })
+);
+bush4.geometry.setAttribute(
+  "uv2",
+  new THREE.Float32BufferAttribute(bush4.geometry.attributes.uv.array, 2)
 );
 bush4.position.x = -3.5;
 bush4.position.y = 0.6 + 0.01;
 bush4.position.z = 0.6 + 4 + 0.01;
 bushes.add(bush1, bush2, bush3, bush4);
+bushes.castShadow = true;
 scene.add(bushes);
 
 const graveGeometry = new THREE.BoxGeometry(2, 2, 0.5);
