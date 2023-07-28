@@ -12,6 +12,30 @@ const sizes = {
   height: window.innerHeight,
 };
 
+const textureLoader = new THREE.TextureLoader();
+const wallColorTexture = textureLoader.load("./textures/bricks/color.jpg");
+const wallNormalTexture = textureLoader.load("./textures/bricks/normal.jpg");
+const wallRoughnessTexture = textureLoader.load(
+  "./textures/bricks/roughness.jpg"
+);
+const wallAoTexture = textureLoader.load(
+  "./textures/bricks/ambientOcclusion.jpg"
+);
+const doorColorTexture = textureLoader.load("./textures/door/color.jpg");
+const doorAlphaTexture = textureLoader.load("./textures/door/alpha.jpg");
+const doorAoTexture = textureLoader.load(
+  "./textures/door/ambientOcclusion.jpg"
+);
+const doorHeightTexture = textureLoader.load("./textures/door/height.jpg");
+const doorMetalnessTexture = textureLoader.load(
+  "./textures/door/metalness.jpg"
+);
+const doorRoughnessTexture = textureLoader.load(
+  "./textures/door/roughness.jpg"
+);
+const doorNormalTexture = textureLoader.load("./textures/door/normal.jpg");
+console.log(doorColorTexture);
+
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
 scene.add(camera);
 camera.position.z = 17;
@@ -21,27 +45,53 @@ const grass = new THREE.Mesh(
   new THREE.PlaneGeometry(50, 50, 64, 64),
   new THREE.MeshStandardMaterial({ color: "#0d5c1e", side: THREE.DoubleSide })
 );
+grass.receiveShadow = true;
 grass.rotation.x = -Math.PI * 0.5;
 scene.add(grass);
 
 const house = new THREE.Group();
 const walls = new THREE.Mesh(
-  new THREE.BoxGeometry(8, 8, 8),
-  new THREE.MeshStandardMaterial({ color: "#801f1f" })
+  new THREE.BoxGeometry(8, 6, 8),
+  new THREE.MeshStandardMaterial({
+    color: "#965a38",
+    map: wallColorTexture,
+    normalMap: wallNormalTexture,
+    roughnessMap: wallRoughnessTexture,
+    aoMap: wallAoTexture,
+  })
 );
-walls.position.y = 4 + 0.01;
+walls.geometry.setAttribute(
+  "uv2",
+  new THREE.Float32BufferAttribute(walls.geometry.attributes.uv.array, 2)
+);
+walls.position.y = 3 + 0.01;
 const roof = new THREE.Mesh(
   new THREE.ConeGeometry(7, 3, 4),
   new THREE.MeshStandardMaterial({ color: "#e66739" })
 );
-roof.position.y = 9.5 + 0.01;
+roof.position.y = 7 + 0.01;
 roof.rotation.y = Math.PI * 0.25;
 const door = new THREE.Mesh(
-  new THREE.PlaneGeometry(4, 5, 64, 64),
-  new THREE.MeshStandardMaterial({ color: "#e66739" })
+  new THREE.PlaneGeometry(5, 5),
+  new THREE.MeshStandardMaterial({
+    color: "#f2a50a",
+    map: doorColorTexture,
+    aoMap: doorAoTexture,
+    transparent: true,
+    normalMap: doorNormalTexture,
+    roughnessMap: doorRoughnessTexture,
+    metalnessMap: doorMetalnessTexture,
+    displacementMap: doorHeightTexture,
+    alphaMap: doorAlphaTexture,
+    displacementScale: 0.8,
+  })
+);
+door.geometry.setAttribute(
+  "uv2",
+  new THREE.Float32BufferAttribute(door.geometry.attributes.uv.array, 2)
 );
 door.position.y = 2.5;
-door.position.z = 4 + 0.01;
+door.position.z = 4.01;
 house.add(walls, roof, door);
 scene.add(house);
 
@@ -82,6 +132,7 @@ const graveMaterial = new THREE.MeshStandardMaterial({ color: "gray" });
 const graves = new THREE.Group();
 for (let i = 0; i < 50; i++) {
   const grave = new THREE.Mesh(graveGeometry, graveMaterial);
+  grave.castShadow = true;
   const angle = Math.PI * Math.random() * 2;
   const radius = Math.random() * 13 + 9;
   grave.position.y = 1 + 0.01;
@@ -93,8 +144,16 @@ scene.add(graves);
 
 const dirLight = new THREE.DirectionalLight("#1a2f78", 0.7);
 dirLight.position.set(0, 5, 5);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 1024;
+dirLight.shadow.mapSize.height = 1024;
 const ambientLight = new THREE.AmbientLight("#2847b0", 0.7);
-scene.add(dirLight, ambientLight);
+const pointLight = new THREE.PointLight("#f2a50a", 0.6, 20);
+pointLight.shadow.mapSize.width = 1024;
+pointLight.shadow.mapSize.height = 1024;
+pointLight.castShadow = true;
+pointLight.position.set(0, 4, 6);
+scene.add(dirLight, ambientLight, pointLight);
 
 window.addEventListener("resize", () => {
   sizes.width = window.innerWidth;
@@ -113,6 +172,7 @@ const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
 renderer.setClearColor("#262837");
+renderer.shadowMap.enabled = true;
 renderer.setSize(sizes.width, sizes.height);
 renderer.render(scene, camera);
 
